@@ -38,6 +38,9 @@ def main_loop(driver, phrases, result_file, iter_number, age_interval_start, age
     logger.info(f'Filter set on age_interval_start={age_interval_start} age_interval_end={age_interval_end}')
 
     while True:
-        phrases_for_processing = prepare_phrases_for_processing(phrases)
-        chatting(driver, phrases_for_processing, result_file)
-        hunting(driver, phrases.get('welcome')['phrases'], iter_number)
+        try:
+            phrases_for_processing = prepare_phrases_for_processing(phrases)
+            chatting(driver, phrases_for_processing, result_file)
+            hunting(driver, phrases.get('welcome')['phrases'], iter_number)
+        except Exception as e:
+            logger.exception(f'Unexpected exception: {e}')
