@@ -11,9 +11,11 @@ def save(file_name, username, phones):
         pass
 
     if username in content.keys():
-        return
+        return False
 
     content.update({username: {'phones': phones}})
 
     with open(file_name, 'wt', encoding='utf-8') as result_file:
         json.dump(content, result_file)
+
+    return True

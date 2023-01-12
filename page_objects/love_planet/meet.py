@@ -13,7 +13,7 @@ class LovePlanetMeet:
     CHAT = (By.XPATH, '/html/body/div[4]/div/div[2]/div[1]/div[2]/div[1]/div[1]/span[2]')
     TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/textarea')
     SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
-    BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div/div[1]')
+    BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div[1]')
     LIKE = (By.XPATH, '/html/body/div[4]/div/div[2]/div[1]/div[2]/div[1]/div[1]/span[3]')
 
     def __init__(self, driver):

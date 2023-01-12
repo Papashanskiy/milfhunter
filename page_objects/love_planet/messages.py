@@ -14,12 +14,13 @@ logger = logging.getLogger('hunting_app')
 
 
 class LovePlanetMessages(PageObject):
+    ALL_MESSAGES = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div[1]/ul')
     OUR_MESSAGES = (By.CLASS_NAME, 'outbox')
     THEIR_MESSAGES = (By.CLASS_NAME, 'inbox')
     MESSAGES = (By.XPATH, '/html/body/div[4]/div/div[2]/div/ul')
     TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/textarea')
     SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
-    BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div/div[1]')
+    BACK = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
     PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
 
@@ -53,13 +54,21 @@ class LovePlanetMessages(PageObject):
         phones = get_phone(text_of_messages)
         if phones:
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
-            save(result_file, username, phones)
-            photo_url = self.get_profile_photo(username)
-            send_in_tg_chat(username, phones, photo_url)
+            if save(result_file, username, phones):
+                photo_url = self.get_profile_photo(username)
+                send_in_tg_chat(username, phones, photo_url)
 
-    def chatting(self, chat, phrases, result_file):
-        chat.click()
+    def get_all_messages(self):
+        return [x.get_attribute('class') for x in self.driver.find_element(
+            *self.ALL_MESSAGES).find_elements(By.TAG_NAME, 'li')]
 
+    def send_message(self, message):
+        self.driver.find_element(*self.TEXT_INPUT).send_keys(message)
+        time.sleep(2)
+        self.driver.find_element(*self.SUBMIT).click()
+        time.sleep(2)
+
+    def chatting(self, phrases, result_file):
         username = self.driver.current_url.split('/').pop()
         logger.info(f'Chatting with user {username}')
 
@@ -67,37 +76,20 @@ class LovePlanetMessages(PageObject):
             logger.info(f'User {username} doesn`t exist. Skip this user')
             return
 
-        our_messages = self.driver.find_elements(*self.OUR_MESSAGES)
+        all_messages = self.get_all_messages()
+        their_messages_count = all_messages.count('inbox')
+        our_messages_count = all_messages.count('outbox')
 
-        self.save_phones(result_file, username)
+        if their_messages_count > 0:
+            self.save_phones(result_file, username)
 
-        if our_messages and len(our_messages) == 4:
+        if our_messages_count > 3:
             logger.info('We send 4 messages. Skip this user')
-            self.driver.find_element(*self.BACK).click()
-            time.sleep(2)
             return
 
-        their_messages = self.driver.find_elements(*self.THEIR_MESSAGES)
-
-        if not our_messages and their_messages:
-            self.driver.find_element(*self.TEXT_INPUT).send_keys('Привет')
-            time.sleep(2)
-            self.driver.find_element(*self.SUBMIT).click()
-            time.sleep(2)
+        if our_messages_count == 0 and their_messages_count > 0:
+            self.send_message('Привет')
             return
 
-        phrase = random.choice(phrases.get(len(our_messages)))
-        self.driver.find_element(*self.TEXT_INPUT).send_keys(phrase)
-        time.sleep(2)
-        self.driver.find_element(*self.SUBMIT).click()
-        time.sleep(2)
-
-        modal = self.driver.find_element(*self.MODAL)
-        if modal.text:
-            logger.warning('There are captcha! Enter it and submit!')
-            time.sleep(45)
-
-        self._bypass_modal_window()
-
-        self.driver.find_element(*self.BACK).click()
-        time.sleep(2)
+        phrase = random.choice(phrases.get(our_messages_count))
+        self.send_message(phrase)

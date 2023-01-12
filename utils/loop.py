@@ -23,7 +23,8 @@ def chatting(driver, phrases, result_file):
     chats = LovePlanetChats(driver).get_chats()
     while chats:
         try:
-            LovePlanetMessages(driver).chatting(chats.pop(), phrases, result_file)
+            chats.pop().click()
+            LovePlanetMessages(driver).chatting(phrases, result_file)
         except ElementClickInterceptedException:
             pass
         chats = LovePlanetChats(driver).get_chats()

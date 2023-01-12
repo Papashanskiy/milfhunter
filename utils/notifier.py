@@ -4,6 +4,9 @@ import requests
 logger = logging.getLogger('hunting_app')
 
 
+DEFAULT_PHOTO_URL = 'https://cdn-icons-png.flaticon.com/512/456/456212.png'
+
+
 class TelegramBot:
     chat_id = None
     token = None
@@ -24,14 +27,22 @@ class TelegramBot:
         self.session_name = session_name
 
 
+def send_photo(text, photo_url):
+    telegram_bot = TelegramBot()
+    message_data = dict(chat_id=telegram_bot.chat_id, caption=text, photo=photo_url)
+    try:
+        response = requests.get(f"https://api.telegram.org/bot{telegram_bot.token}/sendPhoto", params=message_data)
+        response.raise_for_status()
+        return True
+    except requests.exceptions.HTTPError as e:
+        logger.error(f'Telegram send error: {e}')
+        return False
+
+
 def send_in_tg_chat(username, phones, photo_url):
     telegram_bot = TelegramBot()
     text = f'Название сессии: #{telegram_bot.session_name} \n\n' \
            f'💌  Адрес анкеты: https://loveplanet.ru/page/{username}\n\n' \
            f'📱Номер телефона: {", ".join(phones)}'
-    message_data = dict(chat_id=telegram_bot.chat_id, caption=text, photo=photo_url)
-    try:
-        response = requests.get(f"https://api.telegram.org/bot{telegram_bot.token}/sendPhoto", params=message_data)
-        response.raise_for_status()
-    except Exception as e:
-        logger.error(f'Telegram send error: {e}')
+    if not send_photo(text, photo_url):
+        send_photo(text, DEFAULT_PHOTO_URL)

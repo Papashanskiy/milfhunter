@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 
 
@@ -10,5 +12,9 @@ class LovePlanetChats:
         self.driver.get('https://m.loveplanet.ru/index/mess/new')
 
     def get_chats(self):
-        chats = self.driver.find_element(*self.CHATS).find_elements("tag name", 'li')
+        time.sleep(2)
+        chats_container = self.driver.find_element(*self.CHATS)
+        if not chats_container.text:
+            return []
+        chats = chats_container.find_elements("tag name", 'li')
         return chats
