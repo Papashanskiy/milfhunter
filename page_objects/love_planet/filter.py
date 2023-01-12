@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import Select
 
 
 class LovePlanetFilter:
-    LUPA = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div/div[2]')
+    LUPA = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[2]')
     AGE_START = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[2]/div/select[1]')
     AGE_END = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[2]/div/select[2]')
     NEW_PEOPLE = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[6]/div/div[1]/label')

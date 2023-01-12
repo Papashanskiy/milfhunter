@@ -6,8 +6,9 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from page_objects import PageObject
+from utils.notifier import send_in_tg_chat
 from utils.phones import get_phone
-from utils.saver import save_in_file
+from utils.saver import save
 
 logger = logging.getLogger('hunting_app')
 
@@ -20,6 +21,7 @@ class LovePlanetMessages(PageObject):
     SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
     BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
+    PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
 
     def _is_user_exist(self):
         try:
@@ -30,6 +32,18 @@ class LovePlanetMessages(PageObject):
             time.sleep(2)
             return False
 
+    def get_profile_photo(self, username):
+        start_point_url = self.driver.current_url
+        self.driver.get(f'https://m.loveplanet.ru/index/page/{username}')
+        time.sleep(3)
+        photo_url = None
+        try:
+            photo_url = self.driver.find_element(*self.PHOTO).get_attribute("src")
+        except Exception:
+            pass
+        self.driver.get(start_point_url)
+        return photo_url
+
     def save_phones(self, result_file, username):
         their_messages = self.driver.find_elements(*self.THEIR_MESSAGES)
         if not their_messages:
@@ -39,7 +53,9 @@ class LovePlanetMessages(PageObject):
         phones = get_phone(text_of_messages)
         if phones:
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
-            save_in_file(result_file, username, phones)
+            save(result_file, username, phones)
+            photo_url = self.get_profile_photo(username)
+            send_in_tg_chat(username, phones, photo_url)
 
     def chatting(self, chat, phrases, result_file):
         chat.click()
@@ -61,7 +77,13 @@ class LovePlanetMessages(PageObject):
             time.sleep(2)
             return
 
-        if not our_messages:
+        their_messages = self.driver.find_elements(*self.THEIR_MESSAGES)
+
+        if not our_messages and their_messages:
+            self.driver.find_element(*self.TEXT_INPUT).send_keys('Привет')
+            time.sleep(2)
+            self.driver.find_element(*self.SUBMIT).click()
+            time.sleep(2)
             return
 
         phrase = random.choice(phrases.get(len(our_messages)))

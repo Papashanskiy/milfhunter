@@ -4,7 +4,7 @@ import os
 import logging
 
 from application import run
-
+from utils.notifier import TelegramBot
 
 logger = logging.getLogger('hunting_app')
 logger.setLevel(logging.INFO)
@@ -32,6 +32,12 @@ def parse_arguments():
                         help='age interval', default='27-50')
     parser.add_argument('-i', '--iter_number', required=False,
                         help='number of iterations', default=10, type=int)
+    parser.add_argument('-s', '--session_name', required=False,
+                        default='default_session_name', help='name of bot session')
+    parser.add_argument('-c', '--telegram_chat_id', required=True,
+                        help='chat id of telegram group')
+    parser.add_argument('-t', '--telegram_token', required=True,
+                        help='telegram bot token')
     return parser.parse_args()
 
 
@@ -42,8 +48,12 @@ def main():
     age_interval_start, age_interval_end = args.age.split('-')
     result_file = args.result_file
     iter_number = args.iter_number
-    with open(args.phrases) as phrases_file:
+    with open(args.phrases, encoding='utf-8') as phrases_file:
         phrases = json.load(phrases_file)
+    tg_bot = TelegramBot()
+    tg_bot.set_token(args.telegram_token)
+    tg_bot.set_chat_id(args.telegram_chat_id)
+    tg_bot.set_session_name(args.session_name)
 
     logger.info('Initiate application')
     run(login, password, phrases, result_file, iter_number, age_interval_start, age_interval_end, args.browser)
