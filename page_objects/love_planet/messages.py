@@ -93,3 +93,10 @@ class LovePlanetMessages(PageObject):
 
         phrase = random.choice(phrases.get(our_messages_count))
         self.send_message(phrase)
+
+        modal = self.driver.find_element(*self.MODAL)
+        if modal.text:
+            logger.warning('There are captcha! Enter it and submit!')
+            time.sleep(45)
+
+        self._bypass_modal_window()
