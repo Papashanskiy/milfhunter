@@ -1,47 +1,43 @@
 import logging
 import random
 
-from selenium.common import ElementClickInterceptedException, NoSuchElementException
+from utils.driverutil.context import get_driver
+from utils.phrases import prepare_phrases_for_processing
 
-from page_objects.love_planet.chats import LovePlanetChats
-from page_objects.love_planet.filter import LovePlanetFilter
-from page_objects.love_planet.meet import LovePlanetMeet
-from page_objects.love_planet.messages import LovePlanetMessages
-
-logger = logging.getLogger('hunting_app')
+logger = logging.getLogger('milfhunter')
 
 
-def hunting(driver, welcome_phrases, iter_number=30):
-    for i in range(iter_number):
-        try:
-            LovePlanetMeet(driver).matching(random.choice(welcome_phrases))
-        except (NoSuchElementException, ElementClickInterceptedException):
-            pass
+class MainLoop:
 
+    def __init__(self, controller):
+        self.controller = controller
 
-def chatting(driver, phrases, result_file):
-    chats = LovePlanetChats(driver).get_chats()
-    while chats:
-        try:
+    def _chatting(self, driver, phrases, result_file):
+        chats = self.controller.chats(driver).get_chats()
+        while chats:
             chats.pop().click()
-            LovePlanetMessages(driver).chatting(phrases, result_file)
-        except ElementClickInterceptedException:
-            pass
-        chats = LovePlanetChats(driver).get_chats()
+            self.controller.messages(driver).chatting(phrases, result_file)
+            chats = self.controller.chats(driver).get_chats()
 
+    def _hunting(self, driver, welcome_phrases, iter_number=30):
+        for i in range(iter_number):
+            self.controller.meet(driver).matching(random.choice(welcome_phrases))
 
-def prepare_phrases_for_processing(phrases):
-    return {x['sequence']: x['phrases'] for x in phrases.values()}
+    def _run_main_loop(self, driver, phrases, result_file, iter_number, age_interval_start, age_interval_end):
+        self.controller.filter(driver).set(age_interval_start, age_interval_end)
+        logger.info(f'Filter set on age_interval_start={age_interval_start} age_interval_end={age_interval_end}')
 
+        while True:
+            try:
+                phrases_for_processing = prepare_phrases_for_processing(phrases)
+                self._chatting(driver, phrases_for_processing, result_file)
+                self._hunting(driver, phrases.get('welcome')['phrases'], iter_number)
+            except Exception as e:
+                logger.exception(f'Unexpected exception: {e}')
 
-def main_loop(driver, phrases, result_file, iter_number, age_interval_start, age_interval_end):
-    LovePlanetFilter(driver).set(age_interval_start, age_interval_end)
-    logger.info(f'Filter set on age_interval_start={age_interval_start} age_interval_end={age_interval_end}')
-
-    while True:
-        try:
-            phrases_for_processing = prepare_phrases_for_processing(phrases)
-            chatting(driver, phrases_for_processing, result_file)
-            hunting(driver, phrases.get('welcome')['phrases'], iter_number)
-        except Exception as e:
-            logger.exception(f'Unexpected exception: {e}')
+    def run(self, username, password, phrases, result_file, iter_number,
+            age_interval_start, age_interval_end, browser='chrome'):
+        with get_driver(browser) as driver:
+            self.controller.login(driver).login(username, password)
+            logger.info('Success auth')
+            self._run_main_loop(driver, phrases, result_file, iter_number, age_interval_start, age_interval_end)

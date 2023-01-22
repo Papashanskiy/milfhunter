@@ -2,18 +2,18 @@ import logging
 import random
 import time
 
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.common import NoSuchElementException, ElementClickInterceptedException
 
-from page_objects import PageObject
+from controllers import MessagesController
 from utils.notifier import send_in_tg_chat
 from utils.phones import get_phone
 from utils.saver import save
 
-logger = logging.getLogger('hunting_app')
+logger = logging.getLogger('milfhunter')
 
 
-class LovePlanetMessages(PageObject):
+class LovePlanetMessages(MessagesController):
     ALL_MESSAGES = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div[1]/ul')
     OUR_MESSAGES = (By.CLASS_NAME, 'outbox')
     THEIR_MESSAGES = (By.CLASS_NAME, 'inbox')
@@ -22,6 +22,7 @@ class LovePlanetMessages(PageObject):
     SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
     BACK = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
+    CLOSE_MODAL = (By.XPATH, '/html/body/div[2]/div/div[1]/div/div[1]')
     PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
 
     def _is_user_exist(self):
@@ -68,35 +69,43 @@ class LovePlanetMessages(PageObject):
         self.driver.find_element(*self.SUBMIT).click()
         time.sleep(2)
 
-    def chatting(self, phrases, result_file):
-        username = self.driver.current_url.split('/').pop()
-        logger.info(f'Chatting with user {username}')
-
-        if not self._is_user_exist():
-            logger.info(f'User {username} doesn`t exist. Skip this user')
-            return
-
-        all_messages = self.get_all_messages()
-        their_messages_count = all_messages.count('inbox')
-        our_messages_count = all_messages.count('outbox')
-
-        if their_messages_count > 0:
-            self.save_phones(result_file, username)
-
-        if our_messages_count > 3:
-            logger.info('We send 4 messages. Skip this user')
-            return
-
-        if our_messages_count == 0 and their_messages_count > 0:
-            self.send_message('Привет')
-            return
-
-        phrase = random.choice(phrases.get(our_messages_count))
-        self.send_message(phrase)
-
+    def _bypass_modal_window(self):
         modal = self.driver.find_element(*self.MODAL)
-        if modal.text:
-            logger.warning('There are captcha! Enter it and submit!')
-            time.sleep(45)
+        if modal.text and 'Не упусти новое знакомство!' in modal.text:
+            self.driver.find_element(*self.CLOSE_MODAL).click()
 
-        self._bypass_modal_window()
+    def chatting(self, phrases, result_file):
+        try:
+            username = self.driver.current_url.split('/').pop()
+            logger.info(f'Chatting with user {username}')
+
+            if not self._is_user_exist():
+                logger.info(f'User {username} doesn`t exist. Skip this user')
+                return
+
+            all_messages = self.get_all_messages()
+            their_messages_count = all_messages.count('inbox')
+            our_messages_count = all_messages.count('outbox')
+
+            if their_messages_count > 0:
+                self.save_phones(result_file, username)
+
+            if our_messages_count > 3:
+                logger.info('We send 4 messages. Skip this user')
+                return
+
+            if our_messages_count == 0 and their_messages_count > 0:
+                self.send_message('Привет')
+                return
+
+            phrase = random.choice(phrases.get(our_messages_count))
+            self.send_message(phrase)
+
+            modal = self.driver.find_element(*self.MODAL)
+            if modal.text:
+                logger.warning('There are captcha! Enter it and submit!')
+                time.sleep(45)
+
+            self._bypass_modal_window()
+        except ElementClickInterceptedException:
+            pass

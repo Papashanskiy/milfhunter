@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from driverutil.browser import Browser
+from utils.driverutil.browser import Browser
 
 
 @contextmanager

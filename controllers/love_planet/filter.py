@@ -3,8 +3,10 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
+from controllers import FilterController
 
-class LovePlanetFilter:
+
+class LovePlanetFilter(FilterController):
     LUPA = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[2]')
     AGE_START = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[2]/div/select[1]')
     AGE_END = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[2]/div/select[2]')
@@ -12,7 +14,7 @@ class LovePlanetFilter:
     SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/form/ul/li[7]/div/div')
 
     def __init__(self, driver):
-        self.driver = driver
+        super().__init__(driver)
         self.driver.get('https://m.loveplanet.ru/index/meet')
 
     def set(self, age_interval_start, age_interval_end):
