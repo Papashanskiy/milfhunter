@@ -3,7 +3,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
-from controllers import FilterController
+from controllers.controller import FilterController
 
 
 class LovePlanetFilter(FilterController):

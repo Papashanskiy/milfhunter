@@ -5,7 +5,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException, ElementClickInterceptedException
 
-from controllers import MessagesController
+from controllers.controller import MessagesController
 from utils.notifier import send_in_tg_chat
 from utils.phones import get_phone
 from utils.saver import save

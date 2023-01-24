@@ -4,7 +4,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.common import ElementClickInterceptedException, NoSuchElementException
 
-from controllers import MeetController
+from controllers.controller import MeetController
 
 logger = logging.getLogger('milfhunter')
 

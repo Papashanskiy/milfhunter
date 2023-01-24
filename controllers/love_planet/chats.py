@@ -2,7 +2,7 @@ import time
 
 from selenium.webdriver.common.by import By
 
-from controllers import ChatsController
+from controllers.controller import ChatsController
 
 
 class LovePlanetChats(ChatsController):

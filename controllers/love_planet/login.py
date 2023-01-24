@@ -4,7 +4,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from controllers import LoginController
+from controllers.controller import LoginController
 
 
 class LovePlanetLogin(LoginController):
@@ -32,7 +32,7 @@ class LovePlanetLogin(LoginController):
     def login(self, login, password):
         self.driver.find_element(*self.HAVE_LOVE_PLANET_ACCOUNT).click()
         self.driver.find_element(*self.LOGIN_FIELD).send_keys(login)
-        self.driver.find_element(*self.PASSWORD_FIELD).send_keys(password)
+        self.driver.find_element(*self.PASSWORD_FIELD).send_keys(password + Keys.RETURN)
 
         if self._is_captcha():
             time.sleep(45)
