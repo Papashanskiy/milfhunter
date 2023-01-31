@@ -22,6 +22,9 @@ class MambaMeet(MeetController):
     BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div[1]')
     LIKE = (By.XPATH, '/html/body/div[2]/div[1]/div[4]/div/div[2]/div/div/section'
                       '/div/div[1]/div[7]/div[2]/div[1]/div[4]/div/button[3]')
+    MESSAGES_BODY = (By.XPATH, '/html/body/div[2]/div[1]/div[4]/div/div[2]')
+
+    CLEAN_CHAT_TEXT = 'Начать знакомство — это просто! Нужно всего лишь написать "Привет!".'
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -36,6 +39,17 @@ class MambaMeet(MeetController):
             logger.info(f'Hunting user with username {username}')
 
             # ######### We need to finish this part ######### #
+            messages_body = self.driver.find_element(*self.MESSAGES_BODY).text
+            if self.CLEAN_CHAT_TEXT in messages_body:
+                self.driver.find_element(*self.TEXT_INPUT).send_keys(welcome_phrase + Keys.RETURN)
+                time.sleep(2)
+                self.driver.back()
+                time.sleep(2)
+
+                self.driver.find_element(*self.LIKE).click()
+                time.sleep(2)
+
+
             messages = self.driver.find_element(*self.ALL_MESSAGES)
             if messages.text:
                 logger.info('We already send message to this user. Skip him')
@@ -45,12 +59,6 @@ class MambaMeet(MeetController):
                 return
             # ############################################### #
 
-            self.driver.find_element(*self.TEXT_INPUT).send_keys(welcome_phrase + Keys.RETURN)
-            time.sleep(2)
-            self.driver.back()
-            time.sleep(2)
 
-            self.driver.find_element(*self.LIKE).click()
-            time.sleep(2)
         except (NoSuchElementException, ElementClickInterceptedException):
             pass

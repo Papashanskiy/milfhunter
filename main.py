@@ -39,7 +39,7 @@ def parse_arguments():
                         help='chat id of telegram group')
     parser.add_argument('-t', '--telegram_token', required=True,
                         help='telegram bot token')
-    parser.add_argument('--site', required=True,
+    parser.add_argument('-u', '--url', required=True,
                         help='site from list: (mamba.ru, loveplanet.ru)')
     return parser.parse_args()
 
@@ -55,9 +55,9 @@ def main():
     tg_bot.set_chat_id(args.telegram_chat_id)
     tg_bot.set_session_name(args.session_name)
 
-    controller = available_controllers.get(args.site)
+    controller = available_controllers.get(args.url)
     if not controller:
-        raise RuntimeError(f'Entered site {args.site} does not support by this application.'
+        raise RuntimeError(f'Entered site {args.url} does not support by this application.'
                            f'Available sites: {available_controllers.keys()}')
 
     logger.info('Initiate application')
