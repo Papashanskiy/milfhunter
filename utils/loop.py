@@ -31,7 +31,7 @@ class MainLoop:
             try:
                 phrases_for_processing = prepare_phrases_for_processing(phrases)
                 self._chatting(driver, phrases_for_processing, result_file)
-                self._hunting(driver, phrases.get('welcome')['phrases'], iter_number)
+                # self._hunting(driver, phrases.get('welcome')['phrases'], iter_number)
             except Exception as e:
                 logger.exception(f'Unexpected exception: {e}')
 
