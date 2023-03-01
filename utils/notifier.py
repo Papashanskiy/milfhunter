@@ -1,7 +1,7 @@
 import logging
 import requests
 
-logger = logging.getLogger('hunting_app')
+logger = logging.getLogger('milfhunter')
 
 
 DEFAULT_PHOTO_URL = 'https://cdn-icons-png.flaticon.com/512/456/456212.png'

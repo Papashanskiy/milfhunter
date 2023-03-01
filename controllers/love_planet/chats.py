@@ -2,13 +2,15 @@ import time
 
 from selenium.webdriver.common.by import By
 
+from controllers.controller import ChatsController
 
-class LovePlanetChats:
+
+class LovePlanetChats(ChatsController):
     CHATS = (By.XPATH, '/html/body/div[4]/div/div[2]/div[2]/ul')
     LI = (By.TAG_NAME, 'li')
 
     def __init__(self, driver):
-        self.driver = driver
+        super().__init__(driver)
         self.driver.get('https://m.loveplanet.ru/index/mess/new')
 
     def get_chats(self):
