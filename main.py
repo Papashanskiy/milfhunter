@@ -5,6 +5,7 @@ import logging
 
 from application import run
 from utils.notifier import TelegramBot
+from utils.senderconfig import SenderConfig
 
 logger = logging.getLogger('hunting_app')
 logger.setLevel(logging.INFO)
@@ -38,6 +39,8 @@ def parse_arguments():
                         help='chat id of telegram group')
     parser.add_argument('-t', '--telegram_token', required=True,
                         help='telegram bot token')
+    parser.add_argument('-u', '--url', required=False,
+                        help='url to send info about user')
     return parser.parse_args()
 
 
@@ -54,6 +57,8 @@ def main():
     tg_bot.set_token(args.telegram_token)
     tg_bot.set_chat_id(args.telegram_chat_id)
     tg_bot.set_session_name(args.session_name)
+    sender = SenderConfig()
+    sender.set_url(args.url)
 
     logger.info('Initiate application')
     run(login, password, phrases, result_file, iter_number, age_interval_start, age_interval_end, args.browser)

@@ -9,6 +9,7 @@ from page_objects import PageObject
 from utils.notifier import send_in_tg_chat
 from utils.phones import get_phone
 from utils.saver import save
+from utils.senderconfig import send_info_into_1c
 
 logger = logging.getLogger('hunting_app')
 
@@ -23,6 +24,9 @@ class LovePlanetMessages(PageObject):
     BACK = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
     PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
+    FULL_NAME = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/div[2]/div[1]/div[2]/div/span[1]/span[1]')
+    AGE = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/div[2]/div[1]/div[2]/div/span[1]/span[2]')
+    DESCRIPTION = (By.CLASS_NAME, 'profile-container')
 
     def _is_user_exist(self):
         try:
@@ -33,17 +37,36 @@ class LovePlanetMessages(PageObject):
             time.sleep(2)
             return False
 
-    def get_profile_photo(self, username):
+    def get_profile_info(self, username):
         start_point_url = self.driver.current_url
         self.driver.get(f'https://m.loveplanet.ru/index/page/{username}')
         time.sleep(3)
+
+        full_name = None
+        try:
+            full_name = self.driver.find_element(*self.FULL_NAME).text
+        except Exception:
+            pass
+
+        age = None
+        try:
+            age = self.driver.find_element(*self.AGE).text
+        except Exception:
+            pass
+
+        description = None
+        try:
+            description = self.driver.find_element(*self.DESCRIPTION).text
+        except Exception:
+            pass
+
         photo_url = None
         try:
             photo_url = self.driver.find_element(*self.PHOTO).get_attribute("src")
         except Exception:
             pass
         self.driver.get(start_point_url)
-        return photo_url
+        return full_name, age, description, photo_url
 
     def save_phones(self, result_file, username):
         their_messages = self.driver.find_elements(*self.THEIR_MESSAGES)
@@ -55,8 +78,9 @@ class LovePlanetMessages(PageObject):
         if phones:
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
             if save(result_file, username, phones):
-                photo_url = self.get_profile_photo(username)
+                full_name, age, description, photo_url = self.get_profile_info(username)
                 send_in_tg_chat(username, phones, photo_url)
+                send_info_into_1c(username, full_name, age, phones, photo_url, description)
 
     def get_all_messages(self):
         return [x.get_attribute('class') for x in self.driver.find_element(
