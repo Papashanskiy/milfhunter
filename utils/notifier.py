@@ -39,10 +39,11 @@ def send_photo(text, photo_url):
         return False
 
 
-def send_in_tg_chat(username, phones, photo_url):
+def send_in_tg_chat(username, full_name, phones, photo_url):
     telegram_bot = TelegramBot()
     text = f'Название сессии: #{telegram_bot.session_name} \n\n' \
-           f'💌  Адрес анкеты: https://loveplanet.ru/page/{username}\n\n' \
+           f'Имя: {full_name}\n\n' \
+           f'💌Адрес анкеты: https://loveplanet.ru/page/{username}\n\n' \
            f'📱Номер телефона: {", ".join(phones)}'
     if not send_photo(text, photo_url):
         send_photo(text, DEFAULT_PHOTO_URL)
