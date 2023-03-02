@@ -24,7 +24,7 @@ class LovePlanetMessages(PageObject):
     BACK = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
     PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
-    FULL_NAME = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/div[2]/div[1]/div[2]/div/span[1]/span[1]')
+    FULL_NAME = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div[3]/div[2]/span/span')
     AGE = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/div[2]/div[1]/div[2]/div/span[1]/span[2]')
     DESCRIPTION = (By.CLASS_NAME, 'profile-container')
 
@@ -39,14 +39,15 @@ class LovePlanetMessages(PageObject):
 
     def get_profile_info(self, username):
         start_point_url = self.driver.current_url
-        self.driver.get(f'https://m.loveplanet.ru/index/page/{username}')
-        time.sleep(3)
 
         full_name = None
         try:
             full_name = self.driver.find_element(*self.FULL_NAME).text
         except Exception:
             pass
+
+        self.driver.get(f'https://m.loveplanet.ru/index/page/{username}')
+        time.sleep(3)
 
         age = None
         try:
