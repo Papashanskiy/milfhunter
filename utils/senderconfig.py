@@ -28,7 +28,7 @@ def prepare_user_data(username, full_name, age, phones, photo_url, description):
         'description': description
     }
 
-    schema = [{'key': k, 'type': str(type(v))} for k, v in result_dict]
+    schema = [{'key': k, 'type': str(type(v))} for k, v in result_dict.items()]
 
     return dict(schema=schema, result=result_dict)
 
