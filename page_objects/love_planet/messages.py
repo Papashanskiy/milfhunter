@@ -78,8 +78,8 @@ class LovePlanetMessages(PageObject):
         phones = get_phone(text_of_messages)
         if phones:
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
-            if save(result_file, username, phones):
-                full_name, age, description, photo_url = self.get_profile_info(username)
+            full_name, age, description, photo_url = self.get_profile_info(username)
+            if save(result_file, username, phones, full_name, age, description, photo_url):
                 send_in_tg_chat(username, full_name, phones, photo_url)
                 send_info_into_1c(username, full_name, age, phones, photo_url, description)
 

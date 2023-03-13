@@ -1,5 +1,5 @@
 import logging
-
+import base64
 import requests
 
 logger = logging.getLogger('hunting_app')
@@ -18,14 +18,19 @@ class SenderConfig:
 
 
 def prepare_user_data(username, full_name, age, phones, photo_url, description):
-    return dict(
-        username=username,
-        full_name=full_name,
-        age=age,
-        phones=phones,
-        photo_url=photo_url,
-        description=description
-    )
+    result_dict = {
+        'username': username,
+        'full_name': full_name,
+        'age': age,
+        'phones': phones,
+        'photo_url': photo_url,
+        'photo_base64': base64.b64encode(requests.get(photo_url).content).decode('utf-8'),
+        'description': description
+    }
+
+    schema = [{'key': k, 'type': str(type(v))} for k, v in result_dict]
+
+    return dict(schema=schema, result=result_dict)
 
 
 def send_info_into_1c(username, full_name, age, phones, photo_url, description):
