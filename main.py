@@ -4,6 +4,7 @@ import os
 import logging
 
 from application import run
+from driverutil.browser import BrowserOptions
 from utils.notifier import TelegramBot
 from utils.outer_sender import SenderConfig
 
@@ -41,6 +42,8 @@ def parse_arguments():
                         help='telegram bot token')
     parser.add_argument('-u', '--url', required=False,
                         help='url to send info about user')
+    parser.add_argument('--headless', required=False, default=False, action=argparse.BooleanOptionalAction, 
+                        help='allow lounch system without browser gui. true == --headless; false == --no-headless')
     return parser.parse_args()
 
 
@@ -59,6 +62,7 @@ def main():
     tg_bot.set_session_name(args.session_name)
     sender = SenderConfig()
     sender.set_url(args.url)
+    BrowserOptions.headless = args.headless
 
     logger.info('Initiate application')
     run(login, password, phrases, result_file, iter_number, age_interval_start, age_interval_end, args.browser)
