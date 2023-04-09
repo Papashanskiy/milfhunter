@@ -81,11 +81,11 @@ class LovePlanetMessages(PageObject):
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
             full_name, age, description, photo_url = self.get_profile_info(username)
 
-            if save(result_file, username, phones, full_name, age, description, photo_url):
-                send_in_tg_chat(username, full_name, phones, photo_url)
+            user_data = create_user_data(username, full_name, age, phones, photo_url, 
+                                         description, TelegramBot().session_name)
 
-                user_data = create_user_data(username, full_name, age, phones, photo_url, 
-                                             description, TelegramBot().session_name)
+            if save(result_file, user_data):
+                send_in_tg_chat(username, full_name, phones, photo_url)
                 send_info_into_1c(user_data)
 
     def get_all_messages(self):
