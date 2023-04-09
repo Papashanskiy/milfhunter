@@ -11,8 +11,8 @@ class LovePlanetMeet:
     ALL_MESSAGES = (By.XPATH, '/html/body/div[4]/div[2]/div[2]/div/ul')
     LI = (By.TAG_NAME, 'li')
     CHAT = (By.XPATH, '/html/body/div[4]/div/div[2]/div[1]/div[2]/div[1]/div[1]/span[2]')
-    TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/textarea')
-    SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
+    TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/textarea')
+    SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/button')
     BACK = (By.XPATH, '/html/body/div[4]/div[2]/div[1]/div/div[1]')
     LIKE = (By.XPATH, '/html/body/div[4]/div/div[2]/div[1]/div[2]/div[1]/div[1]/span[3]')
 

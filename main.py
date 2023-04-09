@@ -5,7 +5,7 @@ import logging
 
 from application import run
 from utils.notifier import TelegramBot
-from utils.senderconfig import SenderConfig
+from utils.outer_sender import SenderConfig
 
 logger = logging.getLogger('hunting_app')
 logger.setLevel(logging.INFO)
