@@ -2,7 +2,7 @@ import json
 from json import JSONDecodeError
 
 
-def save(file_name, username, phones, full_name=None, age=None, description=None, photo_url=None):
+def save(file_name, username, user_data=None):
     content = {}
     try:
         with open(file_name, 'r', encoding='utf-8') as file:
@@ -16,11 +16,7 @@ def save(file_name, username, phones, full_name=None, age=None, description=None
     content.update(
         {
             username: {
-                'phones': phones,
-                'full_name': full_name,
-                'age': age,
-                'description': description,
-                'photo_url': photo_url
+                'send_to_1C_json': user_data
             }
         }
     )
