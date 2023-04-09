@@ -8,10 +8,10 @@ from page_objects import PageObject
 
 
 class LovePlanetLogin(PageObject):
-    HAVE_LOVE_PLANET_ACCOUNT = (By.XPATH, '/html/body/div/div/amp-script/div[2]/a[3]')
-    LOGIN_FIELD = (By.XPATH, '/html/body/div[2]/div/div/div[2]/form/ul/li[1]/input')
-    PASSWORD_FIELD = (By.XPATH, '/html/body/div[2]/div/div/div[2]/form/ul/li[2]/input')
-    AUTH_FIELD = (By.XPATH, '/html/body/div[2]/div/div/div[2]/form/ul')
+    HAVE_LOVE_PLANET_ACCOUNT = (By.XPATH, '/html/body/div/div/amp-script/div[3]/a[3]')
+    LOGIN_FIELD = (By.XPATH, '/html/body/div[1]/div/div/div[2]/form/ul/li[1]/input')
+    PASSWORD_FIELD = (By.XPATH, '/html/body/div[1]/div/div/div[2]/form/ul/li[2]/input')
+    AUTH_FIELD = (By.XPATH, '/html/body/div[1]/div/div/div[2]/form/button')
 
     def __init__(self, driver):
         super().__init__(driver)

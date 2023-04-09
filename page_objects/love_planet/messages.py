@@ -6,10 +6,11 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from page_objects import PageObject
-from utils.notifier import send_in_tg_chat
+from utils.user_data import create_user_data
+from utils.notifier import TelegramBot, send_in_tg_chat
 from utils.phones import get_phone
 from utils.saver import save
-from utils.senderconfig import send_info_into_1c
+from utils.outer_sender import send_info_into_1c
 
 logger = logging.getLogger('hunting_app')
 
@@ -19,8 +20,8 @@ class LovePlanetMessages(PageObject):
     OUR_MESSAGES = (By.CLASS_NAME, 'outbox')
     THEIR_MESSAGES = (By.CLASS_NAME, 'inbox')
     MESSAGES = (By.XPATH, '/html/body/div[4]/div/div[2]/div/ul')
-    TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/textarea')
-    SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[1]/button')
+    TEXT_INPUT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/textarea')
+    SUBMIT = (By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/button')
     BACK = (By.XPATH, '/html/body/div[4]/div/div[1]/div/div[1]')
     MODAL = (By.XPATH, '/html/body/div[2]')
     PHOTO = (By.XPATH, '/html/body/div[4]/div/div[2]/div/div[1]/div/div[2]/div[2]/img')
@@ -79,9 +80,13 @@ class LovePlanetMessages(PageObject):
         if phones:
             logger.info(f'Found phones {phones}. Save it in file {result_file}')
             full_name, age, description, photo_url = self.get_profile_info(username)
+
             if save(result_file, username, phones, full_name, age, description, photo_url):
                 send_in_tg_chat(username, full_name, phones, photo_url)
-                send_info_into_1c(username, full_name, age, phones, photo_url, description)
+
+                user_data = create_user_data(username, full_name, age, phones, photo_url, 
+                                             description, TelegramBot().session_name)
+                send_info_into_1c(user_data)
 
     def get_all_messages(self):
         return [x.get_attribute('class') for x in self.driver.find_element(
